@@ -26,3 +26,5 @@ pip install -r requirements.txt
 
 Убедитесь, что файлы science.txt и req.txt находятся в том же каталоге, что и markov.py.
 
+Результаты работы м-метода (1 лаб) и сравнение с использованием готовых библиотек лежат здесь: 
+https://docs.google.com/spreadsheets/d/16IGZ0JuCNxsUW8xGRGswrkEbV1SupC3bQ1q7-tBkDN4/edit?hl=ru&gid=1418917068#gid=1418917068
