@@ -80,8 +80,7 @@ def get_suggestion(chain, words):
 def main(file_path, input_words):
     with open(file_path, 'r', encoding='utf-8') as file:
         text = file.read()
-    n_gram = int(input('Введите длину n-граммы: '))
-    #n_gram = len(input_words) # точный результат
+    n_gram = len(input_words) # точный результат
     markov_chain = build_markov_chain(text, n_gram)
     suggestion = get_suggestion(markov_chain, simple_lemmatizer(input_words, build_frequency_dict(input_words)))
     return suggestion

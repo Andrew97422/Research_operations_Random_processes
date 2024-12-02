@@ -25,8 +25,18 @@ def SimplexMethod(simplex_table, extremum_sign, it=0):
                 print('\n' + 'Нет решения')
                 return
             print('\n' + 'Решение')
+            res = ''
             for j in simplex_table.index:
-                print(f"{j} = {simplex_table.loc[j].loc['values']}")
+                if len(j) == 3 and int(j[1:3]) >= len(prices):
+                    continue
+                else:
+                    print(f"{j} = {simplex_table.loc[j].loc['values']}")
+                    #res.append(float(simplex_table.loc[j].loc['values']))
+                    res += str(float(simplex_table.loc[j].loc['values'])) + ', '
+
+            print(res)
+
+
             print(f'Число итераций: {it}')
             return simplex_table
 
@@ -141,39 +151,25 @@ protein_tolerance = 5
 fat_tolerance = 5
 carb_tolerance = 5
 
-# Спрашиваем пользователя, какие ограничения он хочет задать
-use_calories = input("Использовать ограничение по калориям? (y/n): ") == 'y'
-use_proteins = input("Использовать ограничение по белкам? (y/n): ") == 'y'
-use_fats = input("Использовать ограничение по жирам? (y/n): ") == 'y'
-use_carbs = input("Использовать ограничение по углеводам? (y/n): ") == 'y'
-
 # Ввод данных для выбранных ограничений
-if use_calories:
-    desired_calories = float(input("Введите желаемое количество калорий: "))
-if use_proteins:
-    desired_proteins = float(input("Введите желаемое количество белков: "))
-if use_fats:
-    desired_fats = float(input("Введите желаемое количество жиров: "))
-if use_carbs:
-    desired_carbs = float(input("Введите желаемое количество углеводов: "))
+desired_calories = float(input("Введите желаемое количество калорий: "))
+desired_proteins = float(input("Введите желаемое количество белков: "))
+desired_fats = float(input("Введите желаемое количество жиров: "))
+desired_carbs = float(input("Введите желаемое количество углеводов: "))
 
 # Создаем списки для A и b
 A_list = []
 b_list = []
 
 # Добавляем выбранные ограничения в A и b
-if use_calories:
-    A_list.extend([calories, calories])
-    b_list.extend([desired_calories + calorie_tolerance, desired_calories - calorie_tolerance])
-if use_proteins:
-    A_list.extend([proteins, proteins])
-    b_list.extend([desired_proteins + protein_tolerance, desired_proteins - protein_tolerance])
-if use_fats:
-    A_list.extend([fats, fats])
-    b_list.extend([desired_fats + fat_tolerance, desired_fats - fat_tolerance])
-if use_carbs:
-    A_list.extend([carbs, carbs])
-    b_list.extend([desired_carbs + carb_tolerance, desired_carbs - carb_tolerance])
+A_list.extend([calories, calories])
+b_list.extend([desired_calories + calorie_tolerance, desired_calories - calorie_tolerance])
+A_list.extend([proteins, proteins])
+b_list.extend([desired_proteins + protein_tolerance, desired_proteins - protein_tolerance])
+A_list.extend([fats, fats])
+b_list.extend([desired_fats + fat_tolerance, desired_fats - fat_tolerance])
+A_list.extend([carbs, carbs])
+b_list.extend([desired_carbs + carb_tolerance, desired_carbs - carb_tolerance])
 
 # Преобразуем списки в матрицы
 A = np.array(A_list)
