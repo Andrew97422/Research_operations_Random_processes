@@ -20,9 +20,32 @@ def SimplexMethod(simplex_table, extremum_sign, it=0):
                 count += 1
                 if a is None or extremum_sign * z_raw[i] > extremum_sign * a[1]:
                     a = [i, z_raw[i]]
+
         if count == 0:
             if any('R' in x for x in raw_names):
-                print('\n' + 'Нет решения')
+                print('\n' + 'Решение')
+                res = ''
+                z = 0
+                for j in simplex_table.index:
+                    if len(j) == 3 and int(j[1:3]) >= len(prices):
+                        continue
+                    else:
+                        if j == 'z':
+                            continue
+                        print(f"{j} = {simplex_table.loc[j].loc['values']}")
+                        # res.append(float(simplex_table.loc[j].loc['values']))
+
+                        if len(j) == 3:
+                            z += float(simplex_table.loc[j].loc['values']) * prices[int(j[1:3])-1]
+                            #print('j =', j, 'price =', prices[int(j[1:3])])
+                        if len(j) == 2:
+                            z += float(simplex_table.loc[j].loc['values']) * prices[int(j[1])-1]
+                            #print('j =', j, 'price =', prices[int(j[1])])
+                        #print('z =', z)
+                        res += str(float(simplex_table.loc[j].loc['values'])) + ', '
+                res = str(z) + ', ' + res
+                print("z =", str(z))
+                print(res)
                 return
             print('\n' + 'Решение')
             res = ''
@@ -54,6 +77,7 @@ def SimplexMethod(simplex_table, extremum_sign, it=0):
         if len(pos_values) != 0:
             excluded_idx = min(pos_values, key=lambda x: x[1])[0]
         else:
+            print('Нечего исключать')
             print('\n' + 'Нет решения')
             for j in simplex_table.index:
                 print(f"{j} = {simplex_table.loc[j].loc['values']}")
@@ -183,7 +207,7 @@ z_extended = np.concatenate((prices, np.zeros(num_constraints)))
 diag_matrix = np.array([1, -1] * (num_constraints // 2))
 identity_with_alternate_signs = np.diag(diag_matrix)
 
-M = int(input("Введите M:"))
+M = 1000
 
 # Объединяем матрицы
 A_extended = np.hstack((A, identity_with_alternate_signs))

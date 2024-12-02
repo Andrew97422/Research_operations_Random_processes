@@ -66,7 +66,7 @@ if result.success:
     res = ''
     for i, qty in enumerate(result.x[:len(prices)]):
         if qty > 0:
-            print(f"  Блюдо {i+1}: {qty:.2f} ед.")
+            print(f"  Блюдо {i+1}: {qty:.4f} ед.")
             count += 1
             res += f", {qty:.2f}"
     print("Общий результат: " + str(result.fun) + res)
