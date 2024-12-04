@@ -7,6 +7,7 @@ warnings.simplefilter(action='ignore', category=FutureWarning)
 
 
 def SimplexMethod(simplex_table, extremum_sign, it=0):
+    global solution
     while True:
         raw_names = simplex_table.index
         inputs = []
@@ -43,6 +44,7 @@ def SimplexMethod(simplex_table, extremum_sign, it=0):
                             #print('j =', j, 'price =', prices[int(j[1])])
                         #print('z =', z)
                         res += str(float(simplex_table.loc[j].loc['values'])) + ', '
+                        solution[j] = simplex_table.loc[j].loc['values']
                 res = str(z) + ', ' + res
                 print("z =", str(z))
                 print(res)
@@ -53,6 +55,7 @@ def SimplexMethod(simplex_table, extremum_sign, it=0):
                 if len(j) == 3 and int(j[1:3]) >= len(prices):
                     continue
                 else:
+                    solution[j] = simplex_table.loc[j].loc['values']
                     print(f"{j} = {simplex_table.loc[j].loc['values']}")
                     #res.append(float(simplex_table.loc[j].loc['values']))
                     res += str(float(simplex_table.loc[j].loc['values'])) + ', '
@@ -208,8 +211,39 @@ diag_matrix = np.array([1, -1] * (num_constraints // 2))
 identity_with_alternate_signs = np.diag(diag_matrix)
 
 M = 1000
+solution = {}
 
 # Объединяем матрицы
 A_extended = np.hstack((A, identity_with_alternate_signs))
 print(z_extended.shape, A_extended.shape, b.shape)
 M_method(z_extended, A_extended, b, M=M, extremum_sign=1)
+
+for key, value in solution.items():
+    solution[key] = float(value)
+
+for key, value in solution.items():
+    if key == 'z':
+        print('z =', value)
+    else:
+        i = int(key[1:])
+        print(f"  Блюдо {i + 1} - {data['блюда'][i - 1]}: {value:.4f} ед.")
+
+print('\nИтоговые значения КБЖУ:')
+total_calories = 0
+total_proteins = 0
+total_fats = 0
+total_carbs = 0
+for key, value in solution.items():
+    if key == 'z':
+        continue
+    else:
+        i = int(key[1:])
+        total_calories += data['ккал'][i - 1] * value
+        total_proteins += data['белки'][i - 1] * value
+        total_fats += data['жиры'][i - 1] * value
+        total_carbs += data['углеводы'][i - 1] * value
+
+print(f"  Калории: {total_calories:.2f}")
+print(f"  Белки: {total_proteins:.2f}")
+print(f"  Жиры: {total_fats:.2f}")
+print(f"  Углеводы: {total_carbs:.2f}")
