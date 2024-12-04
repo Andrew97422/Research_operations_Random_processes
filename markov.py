@@ -7,7 +7,6 @@ def remove_punctuation(text):
             .replace('?', '').replace(';', '').replace(':', '').replace('(', '').replace(')', '').replace('"', ' '))
 
 
-# Функция для создания словаря форм и их частот
 def build_frequency_dict(words):
     frequency_dict = defaultdict(lambda: defaultdict(int))
     for word in words:
@@ -15,13 +14,11 @@ def build_frequency_dict(words):
     return frequency_dict
 
 
-# Простой лемматизатор на основе частоты
 def simple_lemmatizer(words, frequency_dict):
     lemmatized = []
     for word in words:
         word_lower = word.lower()
         if word_lower in frequency_dict:
-            # Выбираем самую частую форму слова как лемму
             most_frequent_form = max(frequency_dict[word_lower], key=frequency_dict[word_lower].get)
             lemmatized.append(most_frequent_form.lower())
         else:
@@ -33,10 +30,7 @@ def build_markov_chain(text, n_gram):
     text = remove_punctuation(text)
     words = text.split()
 
-    # Построение словаря форм и их частот
     frequency_dict = build_frequency_dict(words)
-
-    # Лемматизация на основе частот
     words = simple_lemmatizer(words, frequency_dict)
 
     markov_chain = {}
@@ -60,7 +54,23 @@ def build_markov_chain(text, n_gram):
     return markov_chain
 
 
-def get_suggestion(chain, words):
+def get_suggestion(chain, words, num_words_to_predict):
+    results = []
+    current_words = list(words)
+
+    # Генерируем заданное количество слов
+    for _ in range(num_words_to_predict):
+        next_word = get_next_word(chain, current_words)
+        if next_word:
+            results.append(next_word)
+            current_words.append(next_word)
+            current_words.pop(0)  # Поддерживаем падение состояния для n-грамм
+        else:
+            break
+    return ' '.join(results)
+
+
+def get_next_word(chain, words):
     n = len(words)
     while n > 0:
         current_state = tuple(words[:n])
@@ -74,15 +84,16 @@ def get_suggestion(chain, words):
                     return state
         else:
             n -= 1
-    return "нет предсказаний."
+    return None
 
 
-def main(file_path, input_words):
+def main(file_path, input_words, num_words_to_predict):
     with open(file_path, 'r', encoding='utf-8') as file:
         text = file.read()
-    n_gram = len(input_words) # точный результат
+    n_gram = len(input_words)  # точный результат
     markov_chain = build_markov_chain(text, n_gram)
-    suggestion = get_suggestion(markov_chain, simple_lemmatizer(input_words, build_frequency_dict(input_words)))
+    suggestion = get_suggestion(markov_chain, simple_lemmatizer(input_words, build_frequency_dict(input_words)),
+                                num_words_to_predict)
     return suggestion
 
 
@@ -94,5 +105,7 @@ with open('req.txt', 'r', encoding='utf-8') as file:
 input_words = remove_punctuation(input_words)
 input_words = input_words.split()
 
-suggestion = main(file_path, input_words)
+num_words_to_predict = int(input('Введите количество слов для предсказания:'))
+
+suggestion = main(file_path, input_words, num_words_to_predict)
 print("Решение:", suggestion)
